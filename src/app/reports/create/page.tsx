@@ -6,6 +6,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import { Send, Loader2, PieChart } from 'lucide-react';
+import { sendChatMessage } from "./_actions/chat"; 
+
+// APIレスポンスの型を定義（必要に応じて）
+interface ApiResponse {
+  response: string;
+  session_id: string;
+}
 
 const ReportChatInterface = () => {
   const [messages, setMessages] = useState([
@@ -36,15 +43,19 @@ const ReportChatInterface = () => {
     setLoading(true);
 
     // AIの応答をシミュレート
-    setTimeout(() => {
+    setTimeout(async () => {
+
+      const response = await sendChatMessage(input);
+      
       const aiResponse = { 
         role: 'assistant', 
-        content: '承知しました。その内容を報告書に反映しましょう。他に補足する内容はありますか？',
+        content: response["response"],
         reportUpdate: {
           content: input,
           progress: Math.min(reportData.progress + 20, 100) // 進捗を更新
         }
       };
+
       setMessages(prev => [...prev, aiResponse]);
       setReportData(prev => ({
         ...prev,
